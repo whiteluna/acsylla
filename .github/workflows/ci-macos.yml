@@ -70,3 +70,4 @@ jobs:
           rm -r acsylla
           pip install test_wheel/acsylla-*.whl --upgrade
           make test
+          ls -la test_wheel/acsylla-*.whl
