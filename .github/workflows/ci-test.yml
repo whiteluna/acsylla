@@ -31,7 +31,8 @@ jobs:
       - name: Generate linux aarh64
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
-          brew install --cask docker
+          brew install colima
+          colima start
           mkdir /tmp/acsylla
           cp -r . /tmp/acsylla
           docker run -v /tmp/acsylla:/io -e "PYTHON_VERSION=${{matrix.python-version}}" quay.io/pypa/manylinux_2_28_aarch64 /io/bin/build_manylinux_2_28_wheel.sh
