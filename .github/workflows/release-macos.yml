@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     outputs:
-      version: ${{ steps.get_version.outputs.VERSION }}
+      version: ${{ steps.get_version.outputs.VERSION }}${{ matrix.python-version }}${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-latest]
