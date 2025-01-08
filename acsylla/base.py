@@ -23,10 +23,14 @@ from typing import Mapping
 from typing import Optional
 from typing import Sequence
 from typing import Set
+from typing import Tuple
+from typing import TypeVar
 from typing import Union
 from uuid import UUID
 
 import json
+
+ValueType = TypeVar("ValueType")
 
 SupportedType = Union[
     None,
@@ -852,8 +856,8 @@ class Session(metaclass=ABCMeta):
     def query(
         self,
         statement: str,
-        parameters: Union[int, list, tuple, dict] = None,
-        value_types: Optional[Union[tuple["ValueType", ...], list["ValueType"], dict[str, "ValueType"]]] = None,
+        parameters: Union[int, List, Tuple, Dict] = None,
+        value_types: Optional[Union[Tuple[ValueType, ...], List[ValueType], Dict[str, ValueType]]] = None,
         page_size: Optional[int] = None,
         page_state: Optional[bytes] = None,
         timeout: Optional[float] = None,
@@ -1017,8 +1021,8 @@ class Statement(metaclass=ABCMeta):
     @abstractmethod
     def __call__(
         self,
-        parameters: Optional[Union[list, tuple, dict]] = None,
-        value_types: Optional[Union[tuple["ValueType", ...], list["ValueType"], dict[str, "ValueType"]]] = None,
+        parameters: Union[int, List, Tuple, Dict] = None,
+        value_types: Optional[Union[Tuple[ValueType, ...], List[ValueType], Dict[str, ValueType]]] = None,
         page_size: Optional[int] = None,
         page_state: Optional[bytes] = None,
         timeout=None,
@@ -1196,7 +1200,7 @@ class PreparedStatement(metaclass=ABCMeta):
     @abstractmethod
     def __call__(
         self,
-        parameters: Optional[Union[list, tuple, dict]] = None,
+        parameters: Optional[Union[int, List, Tuple, Dict]] = None,
         page_size: Optional[int] = None,
         page_state: Optional[bytes] = None,
         timeout=None,
@@ -1218,7 +1222,7 @@ class PreparedStatement(metaclass=ABCMeta):
     @abstractmethod
     def bind(
         self,
-        parameters: Optional[Union[list, tuple, dict]] = None,
+        parameters: Optional[Union[int, List, Tuple, Dict]] = None,
         page_size: Optional[int] = None,
         page_state: Optional[bytes] = None,
         timeout=None,

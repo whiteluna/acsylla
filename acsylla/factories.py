@@ -15,8 +15,10 @@ from .version import __version__
 from typing import Any
 from typing import Callable
 from typing import Coroutine
+from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
 from uuid import UUID
 
@@ -610,7 +612,7 @@ def create_cluster(
 
 def create_statement(
     statement: str,
-    parameters: Union[int, list, tuple, dict] = None,
+    parameters: Union[int, List, Tuple, Dict] = None,
     page_size: Optional[int] = None,
     page_state: Optional[bytes] = None,
     timeout: Optional[float] = None,
