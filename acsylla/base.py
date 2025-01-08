@@ -18,6 +18,7 @@ from typing import Awaitable
 from typing import Callable
 from typing import Dict
 from typing import Iterable
+from typing import Iterator
 from typing import List
 from typing import Mapping
 from typing import Optional
@@ -1318,9 +1319,6 @@ class Batch(metaclass=ABCMeta):
         Note: Empty string will clear execution profile from statement
         """
 
-
-from collections.abc import Iterator
-from typing import TypeVar
 
 T = TypeVar("T", bound="Row")
 
