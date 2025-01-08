@@ -852,8 +852,8 @@ class Session(metaclass=ABCMeta):
     def query(
         self,
         statement: str,
-        parameters: int | list | tuple | dict = None,
-        value_types: Optional[tuple["ValueType", ...] | list["ValueType"] | dict[str, "ValueType"]] = None,
+        parameters: Union[int, list, tuple, dict] = None,
+        value_types: Optional[Union[tuple["ValueType", ...], list["ValueType"], dict[str, "ValueType"]]] = None,
         page_size: Optional[int] = None,
         page_state: Optional[bytes] = None,
         timeout: Optional[float] = None,
@@ -1018,7 +1018,7 @@ class Statement(metaclass=ABCMeta):
     def __call__(
         self,
         parameters: Optional[Union[list, tuple, dict]] = None,
-        value_types: Optional[tuple["ValueType", ...] | list["ValueType"] | dict[str, "ValueType"]] = None,
+        value_types: Optional[Union[tuple["ValueType", ...], list["ValueType"], dict[str, "ValueType"]]] = None,
         page_size: Optional[int] = None,
         page_state: Optional[bytes] = None,
         timeout=None,

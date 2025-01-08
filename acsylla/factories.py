@@ -610,7 +610,7 @@ def create_cluster(
 
 def create_statement(
     statement: str,
-    parameters: int | list | tuple | dict = None,
+    parameters: Union[int, list, tuple, dict] = None,
     page_size: Optional[int] = None,
     page_state: Optional[bytes] = None,
     timeout: Optional[float] = None,
