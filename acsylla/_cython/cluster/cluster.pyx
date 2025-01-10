@@ -47,7 +47,7 @@ cdef class Cluster:
         and tell the Asyncio Loop that there is data to be processed.
         """
         cb_wrapper = <CallbackWrapper> data
-        #Py_INCREF(cb_wrapper)
+        Py_INCREF(cb_wrapper)
         cb_wrapper.cluster._queue_mutex.lock()
         cb_wrapper.cluster._queue.push(data)
         cb_wrapper.cluster._queue_mutex.unlock()
@@ -74,7 +74,7 @@ cdef class Cluster:
 
             cb_wrapper = <CallbackWrapper> data
             cb_wrapper.set_result()
-        Py_DECREF(cb_wrapper)
+            Py_DECREF(cb_wrapper)
 
     def __init__(
         self,
