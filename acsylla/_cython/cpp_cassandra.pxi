@@ -15,6 +15,7 @@ cdef extern from "<mutex>" namespace "std" nogil:
 
 cdef extern from "posix_to_python_thread.cpp" nogil:
     void posix_to_python_callback(CassFuture* cass_future, void* data)
+    void posix_to_python_logger_callback(const CassLogMessage* message, void* data)
     cdef cppclass PosixToPython:
         PosixToPython(int write_fd)
         int write_fd

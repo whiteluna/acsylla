@@ -49,3 +49,12 @@ void posix_to_python_callback(CassFuture* cass_future, void* data){
     written = write(container->handler->write_fd, "1", strlen("1"));
     delete container;
 }
+
+void posix_to_python_logger_callback(const CassLogMessage* message, void* data){
+    PosixToPython* handler = (PosixToPython*)data;
+    handler->_queue_mutex.lock();
+    handler->_queue.push((void*)message);
+    handler->_queue_mutex.unlock();
+    ssize_t written;
+    written = write(handler->write_fd, "1", strlen("1"));
+}
