@@ -1,7 +1,9 @@
+import asyncio
 import logging
+import socket
 
-from libc.string cimport strcpy
-from posix cimport unistd
+from libc.stdlib cimport free
+from libcpp.memory cimport shared_ptr
 
 logger = logging.getLogger('acsylla')
 
@@ -43,7 +45,7 @@ cdef class Logger:
         self._read_socket, self._write_socket = socket.socketpair()
         loop = asyncio.get_running_loop()
         loop.add_reader(self._read_socket, self._handle_message)
-        self.posix_to_python = new PosixToPython(self._write_socket.fileno())
+        self.posix_to_python = new PosixToPythonLogger(self._write_socket.fileno())
         cass_log_set_callback(<CassLogCallback>posix_to_python_logger_callback, <void*>self.posix_to_python)
 
     def __init__(self, log_level='warn', logging_callback=None):
@@ -69,42 +71,45 @@ cdef class Logger:
 
     def _handle_message(self):
         cdef bytes _ = self._read_socket.recv(1)
-        cdef const CassLogMessage* message
+        cdef shared_ptr[CassLogMessage] data
+        cdef CassLogMessage* message
 
-        self.posix_to_python._queue_mutex.lock()
-        data = self.posix_to_python._queue.front()
-        self.posix_to_python._queue.pop()
-        self.posix_to_python._queue_mutex.unlock()
+        while True:
+            self.posix_to_python._queue_mutex.lock()
+            try:
+                if not self.posix_to_python._queue.empty():
+                    data = self.posix_to_python._queue.front()
+                    self.posix_to_python._queue.pop()
+                    message = data.get()
+                else:
+                    break
+            finally:
+                self.posix_to_python._queue_mutex.unlock()
 
-        message = <CassLogMessage*>data
-        if message == NULL:
-            return
-        log_level = cass_log_level_string(message.severity).decode()
-        if not log_level:
-            return
-        if message.message:
-            log_message = message.message[:len(message.message)].decode(errors='replace')
-        else:
-            return
+            log_level = cass_log_level_string(message.severity).decode()
+            log_message = message.message.decode()
 
-        if self.logging_callback is not None:
-            from acsylla import LogMessage
-            log = LogMessage(
-                time_ms=message.time_ms,
-                log_level=log_level,
-                file=None,
-                line=None,
-                function=None,
-                message=log_message
-            )
-            if asyncio.iscoroutinefunction(self.logging_callback):
-                asyncio.create_task(self.logging_callback(log))
+            if self.logging_callback is not None:
+                from acsylla import LogMessage
+                log = LogMessage(
+                    time_ms=message.time_ms,
+                    log_level=log_level,
+                    file=message.file.decode(),
+                    line=message.line,
+                    function=message.function.decode(),
+                    message=log_message
+                )
+                if asyncio.iscoroutinefunction(self.logging_callback):
+                    asyncio.create_task(self.logging_callback(log))
+                else:
+                    self.logging_callback(log)
             else:
-                self.logging_callback(log)
-        else:
-            logger_fn = self.logger_fn.get(log_level)
-            if logger_fn:
-                logger_fn(log_message)
+                logger_fn = self.logger_fn.get(log_level)
+                if logger_fn:
+                    logger_fn(log_message)
+
+            free(<void*>message.file)
+            free(<void*>message.function)
 
     def set_log_level(self, level):
         if level is not None:
