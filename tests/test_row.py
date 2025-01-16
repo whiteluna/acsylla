@@ -1,4 +1,5 @@
 from acsylla import create_statement
+from datetime import UTC
 from datetime import date
 from datetime import datetime
 from datetime import time
@@ -10,8 +11,7 @@ from ipaddress import IPv6Address
 import pytest
 import uuid
 
-pytestmark = pytest.mark.asyncio
-
+pytestmark = pytest.mark.asyncio(loop_scope="class")
 
 class TestRow:
     async def test_bool(self, session, id_generation):
@@ -439,7 +439,7 @@ class TestRow:
         prepared.bind(0, id_)
         result = await session.execute(prepared)
         row = result.first()
-        assert row.column_value("value_time") == datetime.utcfromtimestamp(value).time()
+        assert row.column_value("value_time") == datetime.fromtimestamp(value, tz=UTC).time()
 
     async def test_time_from_datetime(self, session, id_generation):
         id_ = next(id_generation)
@@ -458,7 +458,7 @@ class TestRow:
 
     async def test_timestamp(self, session, id_generation):
         id_ = next(id_generation)
-        value = datetime.fromisoformat("2022-12-09T18:19:49.322")
+        value = datetime.fromisoformat("2022-12-09T18:19:49.322Z")
         insert_statement = create_statement("INSERT INTO test (id, value_timestamp) values (?, ?)", parameters=2)
         insert_statement.bind_list([id_, value])
         await session.execute(insert_statement)
@@ -471,7 +471,7 @@ class TestRow:
 
     async def test_timestamp_from_str(self, session, id_generation):
         id_ = next(id_generation)
-        value = "2021-07-21 15:24:31"
+        value = "2021-07-21 15:24:31Z"
         insert_statement = await session.create_prepared("INSERT INTO test (id, value_timestamp) values (?, ?)")
         prepared = insert_statement.bind()
         prepared.bind_list([id_, value])
@@ -497,7 +497,7 @@ class TestRow:
         prepared.bind(0, id_)
         result = await session.execute(prepared)
         row = result.first()
-        assert row.column_value("value_timestamp") == datetime.utcfromtimestamp(value)
+        assert row.column_value("value_timestamp") == datetime.fromtimestamp(value, tz=UTC)
 
     async def test_duration(self, session, id_generation):
         id_ = next(id_generation)
@@ -591,7 +591,7 @@ class TestRow:
             "value_smallint": -32768,
             "value_text": "text",
             "value_time": time.fromisoformat("10:48:59"),
-            "value_timestamp": datetime.fromisoformat("2021-07-21 15:24:31"),
+            "value_timestamp": datetime.fromisoformat("2021-07-21 15:24:31Z"),
             "value_timeuuid": str(uuid.uuid1()),
             "value_tinyint": -127,
             "value_varchar": "varchar value",
