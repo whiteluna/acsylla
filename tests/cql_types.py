@@ -1,16 +1,14 @@
-from acsylla import ValueType
-from datetime import timezone
 from datetime import date
 from datetime import datetime
 from datetime import time
 from datetime import timedelta
+from datetime import timezone
 from decimal import Decimal
 from ipaddress import IPv4Address
 from ipaddress import IPv6Address
 from uuid import UUID
 
 UTC = timezone.utc
-
 
 """
 Format description for `native_types`
@@ -33,7 +31,6 @@ key: CQL native type name
 
 native_types = {
     "ascii": {
-        "value_type": ValueType.ASCII,
         "valid": [
             ("good ascii string 0123456789", "good ascii string 0123456789"),
             (123, "123"),
@@ -43,7 +40,6 @@ native_types = {
         "invalid": [("bad_äscii_strinng", UnicodeEncodeError)],
     },
     "bigint": {
-        "value_type": ValueType.BIGINT,
         "valid": [
             (123.45, 123),
             (-9223372036854775808, -9223372036854775808),
@@ -58,18 +54,12 @@ native_types = {
             ("9223372036854775808", OverflowError),
         ],
     },
-    "blob": {
-        "value_type": ValueType.BLOB,
-        "valid": [(b"good_blob", b"good_blob")],
-        "invalid": [("bad_blob", ValueError)],
-    },
+    "blob": {"valid": [(b"good_blob", b"good_blob")], "invalid": [("bad_blob", ValueError)]},
     "boolean": {
-        "value_type": ValueType.BOOLEAN,
         "valid": [(True, True), (False, False), (1, True), (0, False)],
         "invalid": [("bad_boolean", ValueError)],
     },
     "date": {
-        "value_type": ValueType.DATE,
         "valid": [
             ("0001-02-28", ("0001-02-28", date(1, 2, 28))),
             ("0400-03-01", ("0400-03-01", date(400, 3, 1))),
@@ -88,7 +78,6 @@ native_types = {
         "invalid": [("bad_date", ValueError), ("-62105616000", ValueError)],
     },
     "decimal": {
-        "value_type": ValueType.DECIMAL,
         "valid": [
             (
                 Decimal("3.141592653589793115997963468544185161590576171875"),
@@ -109,12 +98,10 @@ native_types = {
         "invalid": [("bad", ValueError), ("bad.decimal", ValueError), ("bad.123", ValueError), ("123.bad", ValueError)],
     },
     "double": {
-        "value_type": ValueType.DOUBLE,
         "valid": [(123.123, 123.123), (123, 123), ("123", 123), ("123.123", 123.123)],
         "invalid": [("bad_double", ValueError)],
     },
     "duration": {
-        "value_type": ValueType.DURATION,
         "valid": [
             ("-1y2mo297d544h5m10s60ms634us3ns", ((-14, -297, -1958710060634003), "-1y2mo297d544h5m10s60ms634us3ns")),
             ("1y", ((12, 0, 0), "1y")),
@@ -130,12 +117,10 @@ native_types = {
         "invalid": [("bad_duration", ValueError), (123, ValueError)],
     },
     "float": {
-        "value_type": ValueType.FLOAT,
         "valid": [(1.0, 1.0), (3, 3.0), (3.14, 3.140000104904175), ("3.14", 3.140000104904175), ("3", 3.0)],
         "invalid": [("bad_float", ValueError)],
     },
     "inet": {
-        "value_type": ValueType.INET,
         "valid": [
             ("127.0.0.1", "127.0.0.1"),
             ("::1", "::1"),
@@ -145,22 +130,18 @@ native_types = {
         "invalid": [("bad_ip", ValueError), (1234, ValueError)],
     },
     "int": {
-        "value_type": ValueType.INT,
         "valid": [(-2147483648, -2147483648), (2147483647, 2147483647), (123.123, 123), ("123", 123)],
         "invalid": [("bad_int", ValueError), (9223372036854775807, OverflowError), ("123.3", ValueError)],
     },
     "smallint": {
-        "value_type": ValueType.SMALL_INT,
         "valid": [(-32768, -32768), (32767, 32767), (1.1, 1), ("32767", 32767)],
         "invalid": [("bad_smallint", ValueError), (2147483647, OverflowError)],
     },
     "text": {
-        "value_type": ValueType.TEXT,
         "valid": [("abcdé text", "abcdé text"), (121, "121"), (date(1, 2, 3), "0001-02-03")],
         "invalid": [],
     },
     "time": {
-        "value_type": ValueType.TIME,
         "valid": [
             (86300.999999999, ("23:58:20.999999999", time(23, 58, 20, 999999))),
             ("17:12:32.999999", ("17:12:32.999999000", time(17, 12, 32, 999999))),
@@ -172,11 +153,10 @@ native_types = {
         "invalid": [("bad_time", ValueError), (167104980116710498011671049, OverflowError), (date.today(), TypeError)],
     },
     "timestamp": {
-        "value_type": ValueType.TIMESTAMP,
         "valid": [
             (
-                datetime.fromisoformat("2022-12-15 22:23:26.538Z"),
-                ("2022-12-15 22:23:26.538Z", datetime.fromisoformat("2022-12-15 22:23:26.538Z")),
+                datetime.fromisoformat("2022-12-15 22:23:26.538+00:00"),
+                ("2022-12-15 22:23:26.538Z", datetime.fromisoformat("2022-12-15 22:23:26.538+00:00")),
             ),
             (datetime(1, 1, 1, 0, 0, 0), ("0001-01-01 00:00:00.000Z", datetime(1, 1, 1, 0, 0, 0, tzinfo=UTC))),
             (datetime(1, 2, 3, 4, 5, 6), ("0001-02-03 04:05:06.000Z", datetime(1, 2, 3, 4, 5, 6, tzinfo=UTC))),
@@ -196,14 +176,13 @@ native_types = {
             (datetime(2400, 3, 1, 4, 5, 6, 7), ("2400-03-01 04:05:06.000Z", datetime(2400, 3, 1, 4, 5, 6, tzinfo=UTC))),
             (datetime(9400, 3, 1, 4, 5, 6, 7), ("9400-03-01 04:05:06.000Z", datetime(9400, 3, 1, 4, 5, 6, tzinfo=UTC))),
             ("2022-02-12 12:34:23", ("2022-02-12 12:34:23.000Z", datetime(2022, 2, 12, 12, 34, 23, tzinfo=UTC))),
-            ("2022-02-12 12:34:23+02:00", ("2022-02-12 10:34:23.000Z", datetime.fromisoformat("2022-02-12 10:34:23Z"))),
+            ("2022-02-12 12:34:23+02:00", ("2022-02-12 10:34:23.000Z", datetime.fromisoformat("2022-02-12 10:34:23+00:00"))),
             (1671049801.789601, ("2022-12-14 20:30:01.789Z", datetime(2022, 12, 14, 20, 30, 1, 789000, tzinfo=UTC))),
             (1671049801, ("2022-12-14 20:30:01.000Z", datetime(2022, 12, 14, 20, 30, 1, tzinfo=UTC))),
         ],
         "invalid": [("bad_timestamp", ValueError)],
     },
     "timeuuid": {
-        "value_type": ValueType.TIMEUUID,
         "valid": [
             ("3cd1a00b-7bee-11ed-aff2-510dcc4598b0", "3cd1a00b-7bee-11ed-aff2-510dcc4598b0"),
             (UUID("3cd1a00b-7bee-11ed-aff2-510dcc4598b0"), "3cd1a00b-7bee-11ed-aff2-510dcc4598b0"),
@@ -211,7 +190,6 @@ native_types = {
         "invalid": [("bad_timeuuid", ValueError), (1234, ValueError)],
     },
     "tinyint": {
-        "value_type": ValueType.TINY_INT,
         "valid": [(127, 127), (-127, -127), ("127", 127), (1.123, 1)],
         "invalid": [
             ("bad_tinyint", ValueError),
@@ -221,20 +199,14 @@ native_types = {
         ],
     },
     "uuid": {
-        "value_type": ValueType.UUID,
         "valid": [
             ("3cd1a00b-7bee-11ed-aff2-510dcc4598b0", "3cd1a00b-7bee-11ed-aff2-510dcc4598b0"),
             (UUID("3cd1a00b-7bee-11ed-aff2-510dcc4598b0"), "3cd1a00b-7bee-11ed-aff2-510dcc4598b0"),
         ],
         "invalid": [("bad_timeuuid", ValueError), (1234, ValueError)],
     },
-    "varchar": {
-        "value_type": ValueType.VARCHAR,
-        "valid": [("varchar", "varchar"), (b"varchar", "varchar")],
-        "invalid": [],
-    },
+    "varchar": {"valid": [("varchar", "varchar"), (b"varchar", "varchar")], "invalid": []},
     "varint": {
-        "value_type": ValueType.VARINT,
         "valid": [(b"9223372036854775807", b"9223372036854775807")],
         "invalid": [("varint_variant", ValueError), ("1234", ValueError)],
     },

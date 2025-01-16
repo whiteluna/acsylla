@@ -461,7 +461,7 @@ class TestRow:
 
     async def test_timestamp(self, session, id_generation):
         id_ = next(id_generation)
-        value = datetime.fromisoformat("2022-12-09T18:19:49.322Z")
+        value = datetime.fromisoformat("2022-12-09T18:19:49.322+00:00")
         insert_statement = create_statement("INSERT INTO test (id, value_timestamp) values (?, ?)", parameters=2)
         insert_statement.bind_list([id_, value])
         await session.execute(insert_statement)
@@ -474,7 +474,8 @@ class TestRow:
 
     async def test_timestamp_from_str(self, session, id_generation):
         id_ = next(id_generation)
-        value = "2021-07-21 15:24:31Z"
+        value = "2021-07-21 15:24:31"
+        expected_value = datetime.fromisoformat("2021-07-21 15:24:31+00:00")
         insert_statement = await session.create_prepared("INSERT INTO test (id, value_timestamp) values (?, ?)")
         prepared = insert_statement.bind()
         prepared.bind_list([id_, value])
@@ -485,7 +486,7 @@ class TestRow:
         prepared.bind(0, id_)
         result = await session.execute(prepared)
         row = result.first()
-        assert row.column_value("value_timestamp") == datetime.fromisoformat(value)
+        assert row.column_value("value_timestamp") == expected_value
 
     async def test_timestamp_from_unixtime(self, session, id_generation):
         id_ = next(id_generation)
@@ -594,7 +595,7 @@ class TestRow:
             "value_smallint": -32768,
             "value_text": "text",
             "value_time": time.fromisoformat("10:48:59"),
-            "value_timestamp": datetime.fromisoformat("2021-07-21 15:24:31Z"),
+            "value_timestamp": datetime.fromisoformat("2021-07-21 15:24:31+00:00"),
             "value_timeuuid": str(uuid.uuid1()),
             "value_tinyint": -127,
             "value_varchar": "varchar value",
