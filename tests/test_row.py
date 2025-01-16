@@ -1,5 +1,6 @@
 from acsylla import create_statement
-from datetime import UTC
+
+from datetime import timezone
 from datetime import date
 from datetime import datetime
 from datetime import time
@@ -10,6 +11,8 @@ from ipaddress import IPv6Address
 
 import pytest
 import uuid
+
+UTC = timezone.utc
 
 pytestmark = pytest.mark.asyncio(loop_scope="class")
 

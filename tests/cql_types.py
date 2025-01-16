@@ -1,5 +1,5 @@
 from acsylla import ValueType
-from datetime import UTC
+from datetime import timezone
 from datetime import date
 from datetime import datetime
 from datetime import time
@@ -8,6 +8,9 @@ from decimal import Decimal
 from ipaddress import IPv4Address
 from ipaddress import IPv6Address
 from uuid import UUID
+
+UTC = timezone.utc
+
 
 """
 Format description for `native_types`
