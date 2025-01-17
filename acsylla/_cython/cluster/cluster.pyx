@@ -618,7 +618,7 @@ cdef class Cluster:
             error = cass_execution_profile_set_token_aware_routing_shuffle_replicas(profile, cass_false)
             raise_if_error(error)
         if latency_aware_routing is not None:
-            cass_execution_profile_set_latency_aware_routing(profile, cass_true)
+            error = cass_execution_profile_set_latency_aware_routing(profile, cass_true)
             raise_if_error(error)
             error = cass_execution_profile_set_latency_aware_routing_settings(
                 profile,

@@ -285,7 +285,7 @@ cdef class Statement:
 
     def bind(self, int idx, object value, object value_type = None):
         cdef CassError error = CASS_OK
-        cdef const CassDataType* cass_data_type
+        cdef const CassDataType* cass_data_type = NULL
         cdef CassValueType cass_value_type
 
         if self.cass_prepared:
@@ -386,7 +386,7 @@ cdef class Statement:
             idx += 1
 
     def bind_by_name(self, str name, object value, object value_type = None):
-        cdef const CassDataType* cass_data_type
+        cdef const CassDataType* cass_data_type = NULL
         cdef CassValueType cass_value_type
 
         if self.prepared == 0:
