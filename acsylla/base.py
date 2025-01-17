@@ -121,6 +121,11 @@ class Cluster(metaclass=ABCMeta):
     for creating a new instance"""
 
     @abstractmethod
+    def destroy(self):
+        """Frees up resources allocated for `Cluster` instance.
+        Use this method if the `Cluster` instance is no longer needed."""
+
+    @abstractmethod
     def set_contact_points(self, contact_points: str) -> None:
         """Sets/Appends contact points. This MUST be set. The first call sets
             the contact points and any subsequent calls appends additional contact

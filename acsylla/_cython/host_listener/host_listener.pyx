@@ -10,15 +10,15 @@ cdef class HostListener:
         loop.add_reader(self._read_socket, self._handle_message)
         self.posix_to_python = new PosixToPythonHostListener(self._write_socket.fileno())
 
+    def __dealloc__(self):
+        del self.posix_to_python
+
     cdef init(self, CassCluster* cass_cluster, callback):
         self.host_listener_callback = callback
         error = cass_cluster_set_host_listener_callback(<CassCluster*>cass_cluster, <CassHostListenerCallback>posix_to_python_host_listener_callback, <void*>self.posix_to_python)
         raise_if_error(error)
 
     def destroy(self):
-        #error = cass_cluster_set_host_listener_callback(<CassCluster*>cass_cluster, NULL, NULL)
-        #raise_if_error(error)
-
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:

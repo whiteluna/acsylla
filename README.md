@@ -99,7 +99,7 @@ cd acsylla
 docker run -v `pwd`:/io -e PYTHON_VERSION=3.13  quay.io/pypa/manylinux_2_28_x86_64  /io/bin/build_manylinux_2_28_wheel.sh
 ```
 
-Example for build wheel for Python 3.12 ***aarch64*** from master branch
+Example for build wheel for Python 3.13 ***aarch64*** from master branch
 ```bash
 git clone https://github.com/acsylla/acsylla.git
 cd acsylla
@@ -133,14 +133,21 @@ async def main():
     )
     insert = await session.prepared_query("INSERT INTO test (id, value) VALUES (?, ?)")
     await asyncio.gather(*[insert([i, i]) for i in range(100)])
-    select = await session.prepared_query("SELECT * FROM test where id in :id")
+    select = await session.prepared_query("SELECT * FROM test WHERE id IN :id")
     async for row in select([(1, 4, 7, 90)]):
         print(row.as_tuple())
 
-    non_prepared = session.query("SELECT * FROM test WHERE id=:id")
+    non_prepared = session.query("SELECT id, value FROM test WHERE id=:id")
     async for row in non_prepared([7], value_types=[acsylla.ValueType.TINY_INT]):
         print(dict(row))
-
+        print(row.as_dict())
+        print(row.as_list())
+        print(row.as_tuple()) # The fastest
+        print(row.id, row.value)
+        print(row["id"], row["value"])        
+        print(row[0], row[1])
+        print(row[:1])
+        print(row[1:])
 
 asyncio.run(main())
 ```
@@ -907,7 +914,7 @@ import acsylla
 async def main():
     cluster = acsylla.create_cluster(['localhost'])
     session = await cluster.create_session(keyspace="acsylla")    
-        statement = acsylla.create_statement("SELECT id, value FROM test")
+    statement = acsylla.create_statement("SELECT id, value FROM test")
     async for row in statement:
         ...
 

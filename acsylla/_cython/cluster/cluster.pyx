@@ -5,6 +5,8 @@ import socket
 cdef class Cluster:
     def destroy(self):
         if self.host_listener:
+            error = cass_cluster_set_host_listener_callback(<CassCluster*>self.cass_cluster, NULL, NULL)
+            raise_if_error(error)
             self.host_listener.destroy()
             self.host_listener = None
         if self.logger:
